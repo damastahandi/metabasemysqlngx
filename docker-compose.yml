@@ -1,0 +1,88 @@
+version: "3.8"
+services:
+ db:
+  container_name: db
+  image: mysql:5.7.30
+  restart: always
+  ports:
+   - '3306:3306'
+  env_file: ./mysql/.env
+  volumes:
+   - 'db-data:/var/lib/mysql'
+   - './mysql/conf/my.cnf:/etc/mysql/conf.d/my.cnf'
+   - './mysql/log:/var/log/mysql'
+  networks:
+   - 'data-analytics'
+ redis:
+  container_name: redis
+  image: redis:6.0.5
+  restart: always
+  ports:
+   - '6379:6379'
+  volumes:
+   - 'redis-data:/data'
+  networks:
+   - 'data-analytics'
+ metabase:
+  container_name: metabase
+  build:
+   context: .
+   dockerfile: metabase/Dockerfile
+  restart: always
+  env_file: ./metabase/.env
+  depends_on:
+   - 'db'
+   - 'redis'
+  ports:
+   - '3000:3000'
+  networks:
+   - 'data-analytics'
+ tomcat:
+  container_name: tomcat
+  image: tomcat:8-jdk8-openjdk
+  restart: always
+  depends_on:
+   - 'db'
+   - 'redis'
+  ports:
+   - '8080:8080'
+  volumes:
+   - './tomcat/conf/server.xml:/usr/local/tomcat/conf/server.xml'
+   - './tomcat/log:/usr/local/tomcat/logs'
+   - './tomcat/webapps:/usr/local/tomcat/webapps'
+  networks:
+   - 'data-analytics'
+ phantomjs:
+  container_name: phantomjs
+  image: shufo/phantomjs:2.1.1
+  restart: always
+  command: --webdriver 8901
+  ports:
+   - '8910:8910'
+  networks:
+   - 'data-analytics'
+ nginx:
+  container_name: nginx
+  image: nginx:1.18.0
+  volumes:
+   - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+   - ./nginx/log:/var/log/nginx
+  depends_on:
+   - 'metabase'
+   - 'tomcat'
+  ports:
+   - '80:80'
+   - '443:443'
+  networks:
+   - 'data-analytics'
+networks:
+ data-analytics:
+  driver: bridge
+  name: data-analytics
+volumes:
+ db-data:
+  driver: local
+  name: db-data
+ redis-data:
+  driver: local
+  name: redis-data
