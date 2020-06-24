@@ -1,2 +1,2 @@
-# Metabase with MySQL Database and Nginx + Tomcat, Redis, and PhantomJS
-Metabase with MySQL and Nginx + Tomcat, Redis, and PhantomJS
+# Metabase with MySQL Database and Nginx
+Metabase with MySQL and Nginx with OJDBC drivers
