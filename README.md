@@ -1,2 +1,2 @@
-# metabasemysqlngx
-Metabase with MySQL and Nginx
+# Metabase with MySQL Database and Nginx + Tomcat, Redis, and PhantomJS
+Metabase with MySQL and Nginx + Tomcat, Redis, and PhantomJS
