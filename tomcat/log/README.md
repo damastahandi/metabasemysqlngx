@@ -1,1 +1,1 @@
-
+# Tomcat log directory
